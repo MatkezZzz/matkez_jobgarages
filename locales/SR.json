@@ -1,0 +1,9 @@
+{
+    "open": "Otvori garazu",
+    "returnVehicle": "Vrati vozilo",
+    "noAccess": "Nemas pristup ovoj garazi!",
+    "noSpace": "Spawn je blokiran!",
+    "drive": "VOZI",
+    "close": "Klikni ESC da zatvoris",
+    "search": "Pretrazi"
+}

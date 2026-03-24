@@ -1,0 +1,9 @@
+{
+    "open": "Open garage",
+    "returnVehicle": "Return vehicle",
+    "noAccess": "You don't have access to this garage",
+    "noSpace": "Spawn point is blocked",
+    "drive": "DRIVE",
+    "close": "Press ESC to close",
+    "search": "Search"
+}
