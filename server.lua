@@ -57,30 +57,3 @@ lib.callback.register('matkez_jobgarages:spawnVehicle', function(src, garage, mo
     end
     return true
 end)
-
-lib.callback.register('matkez_jobgarages:setBucket', function(src, ty, garage)
-    if not src then return false end
-    if not garage then
-        DropPlayer(src, 'Wau')
-        return false
-    end
-
-    local garageCfg = config.garages[garage]
-    if not garageCfg then
-        DropPlayer(src, 'Wau')
-        return false
-    end
-
-    local job = getPlayerJob(src, garageCfg.access.type)
-    if job.name ~= garageCfg.access.name then
-        DropPlayer(src, 'Wau')
-        return false
-    end
-    
-    if ty == 'set' then
-        SetPlayerRoutingBucket(src, src)
-    elseif ty == 'reset' then
-        SetPlayerRoutingBucket(src, 0)
-    end
-    return true
-end)

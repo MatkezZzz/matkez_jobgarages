@@ -3,7 +3,6 @@ local previewVehicle
 local previewCam
 local currentGarage
 local props = {}
-local lastPlayerCoords
 local i = config.icons
 
 function doPreview(model, color)
@@ -30,17 +29,23 @@ function doPreview(model, color)
         end
     end
     if not modelData then return end
-    
+
     DeleteEntity(previewVehicle)
     previewVehicle = nil
     local previewData = garageCfg.preview[modelData.previewType]
+    SendNUIMessage({
+        event = 'loading',
+        show = true
+    })
     RequestModel(model)
     while not HasModelLoaded(model) do
         Wait(0)
     end
-    SetEntityCoords(cache.ped, previewData.vehCoords.xyz, false, false, false, false)
-    Wait(100)
     previewVehicle = CreateVehicle(model, previewData.vehCoords.xyzw, false, false)
+    SendNUIMessage({
+        event = 'loading',
+        show = false
+    })
     SetVehicleDirtLevel(previewVehicle, 0)
     SetVehicleFixed(previewVehicle)
     SetEntityInvincible(previewVehicle, true)
@@ -49,7 +54,7 @@ function doPreview(model, color)
     SetVehicleExtraColours(previewVehicle, 0)
     SetVehicleEngineOn(previewVehicle, true, true, false)
     SetEntityCollision(previewVehicle, false, false)
-    
+
     if modelData.color then
         SetVehicleCustomPrimaryColour(previewVehicle, modelData.color[1], modelData.color[2], modelData.color[3])
         SetVehicleCustomSecondaryColour(previewVehicle, modelData.color[1], modelData.color[2], modelData.color[3])
@@ -61,11 +66,11 @@ function doPreview(model, color)
     if modelData.mods then
         lib.setVehicleProperties(previewVehicle, modelData.mods)
     end
-    TaskWarpPedIntoVehicle(cache.ped, previewVehicle, -1)
     if previewCam then
         RenderScriptCams(false, true, 0, false, false)
         DestroyCam(previewCam)
     end
+    SetFocusPosAndVel(previewData.vehCoords.xyz, 0, 0, 0)
     previewCam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
     SetCamCoord(previewCam, previewData.camCoords.xyz)
     PointCamAtCoord(previewCam, previewData.vehCoords.xyz)
@@ -73,17 +78,12 @@ function doPreview(model, color)
 end
 
 function stopPreview()
+    ClearFocus()
     DeleteEntity(previewVehicle)
     previewVehicle = nil
     RenderScriptCams(false, true, 0, false, false)
     DestroyCam(previewCam)
     previewCam = nil
-    if not lastPlayerCoords then
-        local cfg = config.garages[currentGarage]
-        SetEntityCoords(cache.ped, cfg.interaction.coords.xyz, false, false, false, false)
-    else
-        SetEntityCoords(cache.ped, lastPlayerCoords.xyz, false, false, false, false)
-    end
     currentGarage = nil
     SetEntityInvincible(cache.ped, false)
 end
@@ -110,9 +110,7 @@ function openGarage(garage)
         chooseColor = garageCfg.chooseColor,
         icon = garageCfg.icon
     })
-    lastPlayerCoords = GetEntityCoords(cache.ped).xyz
     SetNuiFocus(true, true)
-    lib.callback.await('matkez_jobgarages:setBucket', false, 'set', garage)
     SetEntityInvincible(cache.ped, true)
 end
 
@@ -227,7 +225,6 @@ RegisterNUICallback('setModel', function (body, rc)
 end)
 
 RegisterNUICallback('close', function (body, rc)
-    lib.callback.await('matkez_jobgarages:setBucket', false, 'reset', currentGarage)
     stopPreview()
     SetNuiFocus(false, false)
     rc('asd')

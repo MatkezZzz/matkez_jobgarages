@@ -8,6 +8,7 @@ const colorPicker = document.getElementById('colorpicker');
 const pickerCont = document.getElementById('colorpickercont');
 const garageIcon = document.getElementById('garageicon');
 const closee = document.getElementById('close');
+const loader = document.getElementById('loader');
 let selected
 let vehColor
 let vehs = [];
@@ -103,6 +104,8 @@ function toggleUi(toggle) {
         divs.forEach(d => d.classList.remove('active'));
         selected = null
         fetch(`https://${GetParentResourceName()}/close`);
+        loader.style.display = 'none';
+        cont.classList.remove('loading');
         setTimeout(() => {
             cont.style.display = 'none';
         }, 600)
@@ -162,6 +165,14 @@ window.addEventListener('message', (event) => {
         garageLabel.innerText = data.label
     } else if (data.event === 'locales') {
         locales = data.locales
+    } else if (data.event === 'loading') {
+        if (data.show) {
+            loader.style.display = 'flex';
+            cont.classList.add('loading');
+        } else {
+            loader.style.display = 'none';
+            cont.classList.remove('loading');
+        }
     }
 });
 
